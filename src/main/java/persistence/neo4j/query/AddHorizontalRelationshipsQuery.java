@@ -1,7 +1,12 @@
+package persistence.neo4j.query;
+
+import domain.Gen;
+import domain.GenCoordinate;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddHorizontalRelationQuery implements CypherQuery {
+public class AddHorizontalRelationshipsQuery implements CypherQuery {
 
     private static final String INDEX_H_INICIO = "indexHA";
     private static final String INDEX_V_INICIO = "indexVA";
@@ -11,18 +16,18 @@ public class AddHorizontalRelationQuery implements CypherQuery {
 
     private Map<String, Object> parametros = new HashMap<>();
 
-    public AddHorizontalRelationQuery(GenId genInicialId, Gen newGen) {
-        parametros.put(INDEX_H_INICIO,genInicialId.getIndexHorizontal());
-        parametros.put(INDEX_V_INICIO,genInicialId.getIndexVertical());
-        parametros.put(INDEX_H_FIN, newGen.getId().getIndexHorizontal());
-        parametros.put(INDEX_V_FIN,newGen.getId().getIndexVertical());
+    public AddHorizontalRelationshipsQuery(GenCoordinate genInicialId, Gen newGen) {
+        parametros.put(INDEX_H_INICIO,genInicialId.getHorizontalIndex());
+        parametros.put(INDEX_V_INICIO,genInicialId.getVerticalIndex());
+        parametros.put(INDEX_H_FIN, newGen.getCoordinate().getHorizontalIndex());
+        parametros.put(INDEX_V_FIN,newGen.getCoordinate().getVerticalIndex());
         parametros.put(BASE_FIN,newGen.getBase());
     }
 
     @Override
     public String query() {
-        return "MATCH (a:Gen {indexH: $indexHA, indexV: $indexVA}) " +
-                "CREATE (a)-[r:HORIZONTAL]->(b:Gen) " +
+        return "MATCH (a {indexH: $indexHA, indexV: $indexVA}) " +
+                "CREATE (a)-[r:HORIZONTAL]->(b) " +
                 "SET b.base= $baseB , b.indexH= $indexHB , b.indexV= $indexVB " +
                 "RETURN b.base";
     }

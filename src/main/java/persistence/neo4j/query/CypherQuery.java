@@ -1,3 +1,5 @@
+package persistence.neo4j.query;
+
 import java.util.Map;
 
 public interface CypherQuery {
