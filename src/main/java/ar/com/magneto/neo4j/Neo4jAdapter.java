@@ -7,16 +7,27 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.TransactionWork;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
+@Component
 public class Neo4jAdapter implements AutoCloseable {
 
-    private final Driver driver;
+    private Driver driver;
 
-    private String uri = "bolt://localhost:7687/";
-    private String user = "neo4j";
-    private String password = "s3cr3t";
+    @Value("${neo4j.url}")
+    private String uri;
 
-    public Neo4jAdapter() {
+    @Value("${neo4j.user}")
+    private String user;
+
+    @Value("${neo4j.password}")
+    private String password;
+
+    @PostConstruct
+    public void init() {
         driver = GraphDatabase.driver( uri, AuthTokens.basic( user, password ) );
     }
 

@@ -3,6 +3,7 @@ package ar.com.magneto.resource;
 import ar.com.magneto.dto.DnaDto;
 import ar.com.magneto.dto.StatsDto;
 import ar.com.magneto.service.StatsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +15,11 @@ import ar.com.magneto.service.GenomeService;
 @RestController
 public class MutanteResource {
 
-    private GenomeService genomaService = new GenomeService();
+    @Autowired
+    private GenomeService genomaService;
 
-    private StatsService statsService = new StatsService();
+    @Autowired
+    private StatsService statsService;
 
     @PostMapping("/mutant")
     public ResponseEntity isMutant(@RequestBody DnaDto dnaDto) {

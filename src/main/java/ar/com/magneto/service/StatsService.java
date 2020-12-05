@@ -2,7 +2,9 @@ package ar.com.magneto.service;
 
 import ar.com.magneto.dto.StatsDto;
 import ar.com.magneto.redis.RedisAdapter;
+import org.springframework.stereotype.Component;
 
+@Component
 public class StatsService {
 
     private static final String HUMAN_DNA_COUNT = "stats:count:dna:human";

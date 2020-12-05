@@ -10,19 +10,25 @@ import ar.com.magneto.neo4j.query.DeleteGenomeQuery;
 import ar.com.magneto.neo4j.query.GenerateGenomeQuery;
 import ar.com.magneto.redis.RedisAdapter;
 import org.neo4j.driver.TransactionWork;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class GenomeService {
 
-    private Neo4jAdapter neo4jService = new Neo4jAdapter();
+    @Autowired
+    private Neo4jAdapter neo4jService;
 
-    private RedisAdapter redisAdapter = new RedisAdapter();
+    @Autowired
+    private RedisAdapter redisAdapter;
 
-    private StatsService statsService = new StatsService();
+    @Autowired
+    private StatsService statsService;
 
     public Boolean isMutant(DnaDto dnaDto) {
         return this.findGenome(dnaDto)

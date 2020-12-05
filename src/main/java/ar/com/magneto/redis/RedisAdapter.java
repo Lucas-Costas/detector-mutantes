@@ -1,9 +1,11 @@
 package ar.com.magneto.redis;
 
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.util.Optional;
 
+@Component
 public class RedisAdapter {
 
     private static final Long ZERO = 0L;
