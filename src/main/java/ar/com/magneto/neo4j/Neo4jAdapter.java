@@ -1,14 +1,13 @@
 package ar.com.magneto.neo4j;
 
+import ar.com.magneto.neo4j.operation.DefaultCypherOperation;
+import ar.com.magneto.neo4j.operation.SingleIntegerChyperOperation;
+import ar.com.magneto.neo4j.query.CypherQuery;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.TransactionWork;
-import ar.com.magneto.neo4j.operation.DefaultCypherOperation;
-import ar.com.magneto.neo4j.operation.SingleIntegerChyperOperation;
-import ar.com.magneto.neo4j.operation.SingleLongChyperOperation;
-import ar.com.magneto.neo4j.query.CypherQuery;
 
 public class Neo4jAdapter implements AutoCloseable {
 
@@ -29,10 +28,6 @@ public class Neo4jAdapter implements AutoCloseable {
 
     public Integer executeWithIntegerResult(CypherQuery cypherQuery ) {
         return execWriteTransaction(new SingleIntegerChyperOperation(cypherQuery));
-    }
-
-    public Long executeWithLongResult(CypherQuery cypherQuery ) {
-        return execWriteTransaction(new SingleLongChyperOperation(cypherQuery));
     }
 
     public void execute(CypherQuery cypherQuery){

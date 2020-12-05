@@ -10,10 +10,6 @@ public class DnaDto {
         this.dna = dna;
     }
 
-    public String[] getDna() {
-        return dna;
-    }
-
     public String getIdGenome(){
         return String.join(",",dna);
     }
