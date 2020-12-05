@@ -1,5 +1,8 @@
 package ar.com.magneto.dto;
 
+import lombok.Data;
+
+@Data
 public class DnaDto {
 
     private String[] dna;
