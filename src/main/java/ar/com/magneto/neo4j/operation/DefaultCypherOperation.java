@@ -6,9 +6,9 @@ import ar.com.magneto.neo4j.query.CypherQuery;
 
 public class DefaultCypherOperation implements TransactionWork<String> {
 
-    private CypherQuery cypherQuery;
+    private CypherQuery<String> cypherQuery;
 
-    public DefaultCypherOperation(CypherQuery cypherQuery) {
+    public DefaultCypherOperation(CypherQuery<String> cypherQuery) {
         this.cypherQuery = cypherQuery;
     }
 

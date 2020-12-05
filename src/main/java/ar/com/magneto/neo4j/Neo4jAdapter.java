@@ -1,8 +1,7 @@
 package ar.com.magneto.neo4j;
 
-import ar.com.magneto.neo4j.operation.DefaultCypherOperation;
-import ar.com.magneto.neo4j.operation.SingleIntegerChyperOperation;
 import ar.com.magneto.neo4j.query.CypherQuery;
+import ar.com.magneto.neo4j.query.NoReturnCypherQuery;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -22,16 +21,16 @@ public class Neo4jAdapter implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         driver.close();
     }
 
-    public Integer executeWithIntegerResult(CypherQuery cypherQuery ) {
-        return execWriteTransaction(new SingleIntegerChyperOperation(cypherQuery));
+    public Integer executeWithIntegerResult(CypherQuery<Integer> cypherQuery ) {
+        return execWriteTransaction(cypherQuery.asOperation());
     }
 
-    public void execute(CypherQuery cypherQuery){
-        execWriteTransaction(new DefaultCypherOperation(cypherQuery));
+    public void execute(NoReturnCypherQuery cypherQuery){
+        execWriteTransaction(cypherQuery.asOperation());
     }
 
     private <T> T execWriteTransaction(TransactionWork<T> cypherOperation){

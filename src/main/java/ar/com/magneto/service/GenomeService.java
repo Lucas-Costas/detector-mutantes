@@ -2,11 +2,18 @@ package ar.com.magneto.service;
 
 import ar.com.magneto.dto.DnaDto;
 import ar.com.magneto.neo4j.Neo4jAdapter;
+import ar.com.magneto.neo4j.operation.DefaultCypherOperation;
+import ar.com.magneto.neo4j.operation.SingleIntegerChyperOperation;
 import ar.com.magneto.neo4j.query.CountMutantSecuencesQuery;
+import ar.com.magneto.neo4j.query.CypherQuery;
 import ar.com.magneto.neo4j.query.DeleteGenomeQuery;
 import ar.com.magneto.neo4j.query.GenerateGenomeQuery;
 import ar.com.magneto.redis.RedisAdapter;
+import org.neo4j.driver.TransactionWork;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class GenomeService {

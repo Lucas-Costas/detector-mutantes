@@ -3,7 +3,7 @@ package ar.com.magneto.neo4j.query;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DeleteGenomeQuery implements CypherQuery {
+public class DeleteGenomeQuery implements NoReturnCypherQuery {
 
     private static final String GENOME_ID = "genomeId";
 

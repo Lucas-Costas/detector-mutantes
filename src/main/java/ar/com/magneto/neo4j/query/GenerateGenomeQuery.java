@@ -5,7 +5,7 @@ import ar.com.magneto.dto.DnaDto;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GenerateGenomeQuery implements CypherQuery {
+public class GenerateGenomeQuery implements NoReturnCypherQuery {
 
     private static final String GENOME_ID = "genomeId";
     private static final String GEN_SIZE = "genSize";
