@@ -1,6 +1,4 @@
-package persistence.neo4j.query;
-
-import persistence.neo4j.query.CypherQuery;
+package ar.com.magneto.neo4j.query;
 
 import java.util.HashMap;
 import java.util.Map;

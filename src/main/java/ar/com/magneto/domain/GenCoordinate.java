@@ -1,4 +1,4 @@
-package domain;
+package ar.com.magneto.domain;
 
 public class GenCoordinate {
 

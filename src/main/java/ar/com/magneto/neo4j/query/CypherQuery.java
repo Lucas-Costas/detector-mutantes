@@ -1,4 +1,4 @@
-package persistence.neo4j.query;
+package ar.com.magneto.neo4j.query;
 
 import java.util.Map;
 

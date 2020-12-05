@@ -1,8 +1,8 @@
-package persistence.neo4j.operation;
+package ar.com.magneto.neo4j.operation;
 
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
-import persistence.neo4j.query.CypherQuery;
+import ar.com.magneto.neo4j.query.CypherQuery;
 
 public class SingleIntegerChyperOperation implements TransactionWork<Integer> {
 

@@ -1,14 +1,14 @@
-package persistence.neo4j;
+package ar.com.magneto.neo4j;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.TransactionWork;
-import persistence.neo4j.operation.DefaultCypherOperation;
-import persistence.neo4j.operation.SingleIntegerChyperOperation;
-import persistence.neo4j.operation.SingleLongChyperOperation;
-import persistence.neo4j.query.CypherQuery;
+import ar.com.magneto.neo4j.operation.DefaultCypherOperation;
+import ar.com.magneto.neo4j.operation.SingleIntegerChyperOperation;
+import ar.com.magneto.neo4j.operation.SingleLongChyperOperation;
+import ar.com.magneto.neo4j.query.CypherQuery;
 
 public class Neo4jAdapter implements AutoCloseable {
 

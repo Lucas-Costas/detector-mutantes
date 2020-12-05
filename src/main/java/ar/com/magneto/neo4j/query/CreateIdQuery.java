@@ -1,4 +1,4 @@
-package persistence.neo4j.query;
+package ar.com.magneto.neo4j.query;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +15,8 @@ public class CreateIdQuery implements CypherQuery {
 
     @Override
     public String query() {
-        return "CREATE (a) " +
-                "SET a.dnaId= $dnaId" +
+        return "CREATE (a:Dna) " +
+                "SET a.dnaId = $dnaId " +
                 "RETURN a.dnaId";
     }
 

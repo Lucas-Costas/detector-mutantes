@@ -1,4 +1,4 @@
-package persistence.neo4j.query;
+package ar.com.magneto.neo4j.query;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +17,10 @@ public class BindIdQuery implements CypherQuery {
 
     @Override
     public String query() {
-        return "CREATE (a)-[:REPRESENTA]->(b) " +
-                "WHERE a.dnaId = $dnaId" +
-                "AND id(b) = $firstNodeId" +
-                "RETURN id(b)";
+        return "MATCH (a:Dna {dnaId: $dnaId}),(b:Gen) " +
+                "WHERE id(b) = $firstNodeId " +
+                "CREATE (a)-[:REPRESENTA]->(b) " +
+                "RETURN b.genomeId";
     }
 
     public Map<String, Object> getParametros() {
