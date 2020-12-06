@@ -1,5 +1,6 @@
 package ar.com.magneto.neo4j;
 
+import ar.com.magneto.exception.Neo4jAdapterException;
 import ar.com.magneto.neo4j.query.CypherQuery;
 import ar.com.magneto.neo4j.query.NoReturnCypherQuery;
 import org.neo4j.driver.AuthTokens;
@@ -14,6 +15,9 @@ import javax.annotation.PostConstruct;
 
 @Component
 public class Neo4jAdapter implements AutoCloseable {
+
+    private static final String CLOSE_CONNECTION_ERROR = "Ocurrio un error al cerrar a conexión con Neo4J";
+    private static final String EXEC_TRANSACTION_ERROR = "Ocurrio un error al ejecutar la transacción en Neo4J";
 
     private Driver driver;
 
@@ -33,7 +37,11 @@ public class Neo4jAdapter implements AutoCloseable {
 
     @Override
     public void close() {
-        driver.close();
+        try {
+            driver.close();
+        } catch (Exception ex){
+            throw new Neo4jAdapterException(CLOSE_CONNECTION_ERROR,ex);
+        }
     }
 
     public Integer executeWithIntegerResult(CypherQuery<Integer> cypherQuery ) {
@@ -47,6 +55,8 @@ public class Neo4jAdapter implements AutoCloseable {
     private <T> T execWriteTransaction(TransactionWork<T> cypherOperation){
         try ( Session session = driver.session() ){
             return session.writeTransaction( cypherOperation );
+        } catch (Exception ex) {
+            throw new Neo4jAdapterException(EXEC_TRANSACTION_ERROR, ex);
         }
     }
 

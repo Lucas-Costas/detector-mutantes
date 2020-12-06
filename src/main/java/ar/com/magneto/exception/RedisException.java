@@ -6,4 +6,7 @@ public class RedisException extends RuntimeException {
         super(message);
     }
 
+    public RedisException(String message, String key, Exception ex) {
+        super(message+"'"+key+"'",ex);
+    }
 }
