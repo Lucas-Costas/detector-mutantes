@@ -15,6 +15,8 @@ class GenerateGenomeQueryTest extends Specification{
             String query = cQuery.query()
         then: "Es la esperada"
             query == "WITH \$genomeId as genomeId " +
+                    "MATCH (a:Gen {genomeId:genomeId} DETACH DELETE a " +
+                    "WITH genomeId " +
                     "UNWIND RANGE(0, \$genSize -1) as j " +
                     "UNWIND RANGE(0, \$genSize -1) as i " +
                     "CREATE (a:Gen) SET a.indexV=j, a.indexH=i, a.base=split(split(genomeId,',')[j],'')[i], a.genomeId=genomeId " +

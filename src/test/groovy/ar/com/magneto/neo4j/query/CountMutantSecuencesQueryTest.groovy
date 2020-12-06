@@ -7,11 +7,11 @@ class CountMutantSecuencesQueryTest extends Specification{
 
     def "Retorna la query para contar las secuencias mutantes"(){
         given: "Una cQuery que cuenta secuencias mutantes"
-            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery()
+            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery("a,b,c")
         when: "Obtengo la query"
             String query = cQuery.query()
         then: "Es la esperada"
-            query == "MATCH path = (a)-[*3..]->(b {base:a.base}) " +
+            query == "MATCH path = (a {genomeId: \$genomeId })-[*3..]->(b {base:a.base, genomeId:a.genomeId}) " +
                      "WHERE id(a) <> id(b) " +
                      "AND none(n IN nodes(path) WHERE n.base<>a.base) " +
                      "AND ( " +
@@ -24,16 +24,16 @@ class CountMutantSecuencesQueryTest extends Specification{
 
     def "Retorna los parametros de la query"(){
         given: "Una cQuery que cuenta secuencias mutantes"
-            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery()
+            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery("a,b,c")
         when: "Obtengo los parametros de la query"
             def parametros = cQuery.getParametros()
         then: "Estan vacios"
-            parametros.isEmpty()
+            parametros == [genomeId: "a,b,c"]
     }
 
     def "Puede transformarse a CypherOperation"(){
         given: "Una cQuery que cuenta secuencias mutantes"
-            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery()
+            CountMutantSecuencesQuery cQuery = new CountMutantSecuencesQuery("a,b,c")
         when: "Obtengo los parametros de la query"
             SingleIntegerChyperOperation operation = cQuery.asOperation()
         then: "Estan vacios"

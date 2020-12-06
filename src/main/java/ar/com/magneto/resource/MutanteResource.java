@@ -16,14 +16,14 @@ import ar.com.magneto.service.GenomeService;
 public class MutanteResource {
 
     @Autowired
-    private GenomeService genomaService;
+    private GenomeService genomeService;
 
     @Autowired
     private StatsService statsService;
 
     @PostMapping("/mutant")
     public ResponseEntity isMutant(@RequestBody DnaDto dnaDto) {
-        HttpStatus status = genomaService.isMutant(dnaDto) ? HttpStatus.OK : HttpStatus.FORBIDDEN;
+        HttpStatus status = genomeService.isMutant(dnaDto) ? HttpStatus.OK : HttpStatus.FORBIDDEN;
         return ResponseEntity.status(status).build();
     }
 

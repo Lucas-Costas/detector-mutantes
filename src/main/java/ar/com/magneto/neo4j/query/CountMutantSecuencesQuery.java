@@ -8,9 +8,17 @@ import java.util.Map;
 
 public class CountMutantSecuencesQuery implements CypherQuery<Integer> {
 
+    private static final String GENOME_ID = "genomeId";
+
+    private Map<String, Object> parametros = new HashMap<>();
+
+    public CountMutantSecuencesQuery(String genomeId) {
+        parametros.put(GENOME_ID,genomeId);
+    }
+
     @Override
     public String query() {
-        return "MATCH path = (a)-[*3..]->(b {base:a.base}) " +
+        return "MATCH path = (a {genomeId: $genomeId })-[*3..]->(b {base:a.base, genomeId:a.genomeId}) " +
                 "WHERE id(a) <> id(b) " +
                 "AND none(n IN nodes(path) WHERE n.base<>a.base) " +
                 "AND ( " +
@@ -23,7 +31,7 @@ public class CountMutantSecuencesQuery implements CypherQuery<Integer> {
 
     @Override
     public Map<String, Object> getParametros() {
-        return new HashMap<>();
+        return parametros;
     }
 
     @Override

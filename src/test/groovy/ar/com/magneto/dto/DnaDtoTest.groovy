@@ -1,6 +1,5 @@
 package ar.com.magneto.dto
 
-import ar.com.magneto.dto.DnaDto
 import spock.lang.Specification
 import spock.lang.Unroll
 
