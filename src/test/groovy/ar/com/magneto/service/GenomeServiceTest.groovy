@@ -2,6 +2,7 @@ package ar.com.magneto.service
 
 import ar.com.magneto.dto.DnaDto
 import ar.com.magneto.exception.GenomeException
+import ar.com.magneto.exception.InvalidDnaException
 import ar.com.magneto.exception.Neo4jAdapterException
 import ar.com.magneto.exception.RedisException
 import ar.com.magneto.exception.StatsException
@@ -29,9 +30,23 @@ class GenomeServiceTest extends Specification {
         service.statsService = statsService
     }
 
+    @Unroll
+    def "Lanza una excepcion cuando el ADN #caso"(){
+        when: "Evaluo un ADN #caso"
+            service.isMutant(dnaDto)
+        then: "Lanza una excepcion por validacion"
+            InvalidDnaException ex = thrown()
+            ex.message == message
+        where:
+            caso                            | dnaDto             | message
+            "esta vacio"                    | anEmptyDnaDto()    | "El ADN no puede estar vacío"
+            "no es cuadrado"                | aNotSquareDnaDto() | "El ADN debe ser una matriz de N x N (cuadrada)"
+            "no esta formado por A,C,T o G" | aMalformedDnaDto() | "El ADN debe estar compuesto por las bases A,T,C o G"
+    }
+
     def "Si encuentra el resultado en REDIS no evalua el genoma y retorna el resultado cacheado"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean isMutant = service.isMutant(dnaDto)
         then: "Encuentro el genoma en REDIS"
@@ -61,7 +76,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si no encuentra el genoma en REDIS lo evalua"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean isMutant = service.isMutant(dnaDto)
             Thread.sleep(300)
@@ -90,10 +105,41 @@ class GenomeServiceTest extends Specification {
             isMutant
     }
 
+    def "Si falla la consulta con REDIS evalua el genoma"(){
+        given: "Un ADN"
+            DnaDto dnaDto = aValidDnaDto()
+        when: "Evaluo si es mutante"
+            Boolean isMutant = service.isMutant(dnaDto)
+            Thread.sleep(300)
+        then: "Encuentro el genoma en REDIS"
+            1 * redisAdapter.getBooleanIfExists(dnaDto.getIdGenome()) >> {throw new RedisException("Oops")}
+        then: "Genera el genoma"
+            1 * neo4jAdapter.execute({verifyAll(it, GenerateGenomeQuery,{
+                it.parametros == [
+                        genomeId: dnaDto.getIdGenome(),
+                        genSize: dnaDto.getGenSize()
+                ]
+            })})
+        and: "Cuenta las secuencias mutantes y encuentra 5"
+            1 * neo4jAdapter.executeWithIntegerResult({verifyAll(it, CountMutantSecuencesQuery,{
+                it.parametros == [genomeId: dnaDto.getIdGenome()]
+            })}) >> 5
+        and: "Se registra el resultado en la cache REDIS"
+            1 * redisAdapter.setBoolean(dnaDto.getIdGenome(),true)
+        and: "Se actualizan las estadisticas"
+            1 * statsService.registerStats(true)
+        and: "Se elimina el genoma"
+            1 * neo4jAdapter.execute({verifyAll(it, DeleteGenomeQuery,{
+                it.parametros == [genomeId: dnaDto.getIdGenome()]
+            })})
+        and: "El ADN es #caso"
+            isMutant
+    }
+
     @Unroll
     def "Evalua un ADN como #caso si tiene #sequencesNumber secuencias mutantes"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
             Thread.sleep(300)
@@ -127,7 +173,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla la generacion el genoma se interrumpe el proceso"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
         then: "Falla la generacion del genoma"
@@ -156,7 +202,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla el conteo de secuencias mutantes se interrumpe el proceso"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
         then: "Falla la generacion del genoma"
@@ -186,7 +232,7 @@ class GenomeServiceTest extends Specification {
     @Unroll
     def "Si ocurre un error al guardar el resultado en REDIS el proceso continua"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
             Thread.sleep(300)
@@ -221,7 +267,7 @@ class GenomeServiceTest extends Specification {
     @Unroll
     def "Si ocurre un error al actualizar las estadísticas falla el proceso. Secuencias encontradas #sequencesNumber"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
         then: "Genera el genoma"
@@ -256,7 +302,7 @@ class GenomeServiceTest extends Specification {
     @Unroll
     def "Si ocurre un error al eliminar el resultado en REDIS el proceso continua"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Evaluo si es mutante"
             Boolean result = service.evaluateGenome(dnaDto)
             Thread.sleep(300)
@@ -290,7 +336,7 @@ class GenomeServiceTest extends Specification {
 
     def "Genera el genoma"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Genero el genoma"
             service.generateGenome(dnaDto)
         then: "Ejecuta la query para generarlo"
@@ -304,7 +350,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla al generar el genoma lanza una excepción"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Genero el genoma"
             service.generateGenome(dnaDto)
         then: "Falla la comunicación con Neo4j"
@@ -321,7 +367,7 @@ class GenomeServiceTest extends Specification {
 
     def "Cuenta las secuencias mutantes de un ADN"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Cuento las secuencia que son mutantes"
             Integer result = service.countMutantSequences(dnaDto.getIdGenome())
         then: "Se ejecuta la query y retorna la cantidad de secuencias mutantes"
@@ -334,7 +380,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla la comunicacion con Neo4J al contar las secuencias mutantes arroja una excepcion"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Cuento las secuencia que son mutantes"
             Integer result = service.countMutantSequences(dnaDto.getIdGenome())
         then: "Se ejecuta la query y retorna la cantidad de secuencias mutantes"
@@ -348,7 +394,7 @@ class GenomeServiceTest extends Specification {
 
     def "Elimina asincrónicamente el genoma"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Elimino asincronicamente el genoma"
             service.deleteGenomeAsynchronously(dnaDto.getIdGenome())
             Thread.sleep(300)
@@ -360,7 +406,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla la eliminacion asincronica del genoma no se cancela el proceso"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Elimino asincrónicamente"
             service.deleteGenomeAsynchronously(dnaDto.getIdGenome())
             Thread.sleep(300)
@@ -374,7 +420,7 @@ class GenomeServiceTest extends Specification {
 
     def "Elimina el genoma"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Elimino el genoma"
             service.deleteGenome(dnaDto.getIdGenome())
         then: "Se elimina el genoma"
@@ -385,7 +431,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla la eliminacion del genoma no se cancela el proceso"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Elimino el genoma"
             service.deleteGenome(dnaDto.getIdGenome())
         then: "Falla al eliminar el genoma"
@@ -398,7 +444,7 @@ class GenomeServiceTest extends Specification {
 
     def "Registra el resultado de una evaluacion de ADN"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Registro el resultado de su evaluación"
             service.saveResult(dnaDto,true)
         then: "Se registra el resultado en la cache REDIS"
@@ -409,7 +455,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla el registro en la cache no se cancela el proceso"(){
         given: "Un ADN evaluado"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Registro el resultado de su evaluación"
             service.saveResult(dnaDto,true)
         then: "Se registra el resultado en la cache REDIS"
@@ -421,7 +467,7 @@ class GenomeServiceTest extends Specification {
     @Unroll
     def "Si falla el registro de estadísticas se cancela el proceso. Caso #isMutant"(){
         given: "Un ADN evaluado"
-           DnaDto dnaDto = aDnaDto()
+           DnaDto dnaDto = aValidDnaDto()
         when: "Registro el resultado de su evaluación"
             service.saveResult(dnaDto,isMutant)
         then: "Se registra el resultado en la cache REDIS"
@@ -439,7 +485,7 @@ class GenomeServiceTest extends Specification {
 
     def "Registra si un ADN es mutante"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Registro que es mutante"
             service.recordGenome(dnaDto,true)
         then: "Lo registra en REDIS usando el id del genoma"
@@ -448,7 +494,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si falla la comunicación con REDIS no lanza una excepcion"(){
         given: "Un ADN"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Registro que es mutante"
             service.recordGenome(dnaDto,true)
         then: "Falla la comunicacion con REDIS"
@@ -460,7 +506,7 @@ class GenomeServiceTest extends Specification {
     @Unroll
     def "Puede retornar el registro cacheado cuando existe y #scenario"(){
         given: "Un ADN a buscar"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Lo busco en la cache redis"
             def result = service.findGenome(dnaDto)
         then: "Consulto con REDIS y retorna un resultado no vacio"
@@ -477,7 +523,7 @@ class GenomeServiceTest extends Specification {
 
     def "Si el ADN no estaba en REDIS retorna un optional vacio"() {
         given: "Un ADN a buscar"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Lo busco en la cache redis"
             def result = service.findGenome(dnaDto)
         then: "Consulto con REDIS y retorna un resultado vacio"
@@ -489,7 +535,7 @@ class GenomeServiceTest extends Specification {
     def """Si falla la comunicación con REDIS al intentar obtener el registro cacheado
            retorna un optional vacio"""() {
         given: "Un ADN a buscar"
-            DnaDto dnaDto = aDnaDto()
+            DnaDto dnaDto = aValidDnaDto()
         when: "Lo busco en la cache redis"
             def result = service.findGenome(dnaDto)
         then: "Consulto con REDIS y lanza una excepcion"
@@ -498,8 +544,20 @@ class GenomeServiceTest extends Specification {
             result.isEmpty()
     }
 
-    def aDnaDto() {
-        new DnaDto(["a", "b", "c"] as String[])
+    def aValidDnaDto() {
+        new DnaDto(["AAA", "CCC", "TTT"] as String[])
+    }
+
+    def anEmptyDnaDto() {
+        new DnaDto([] as String[])
+    }
+
+    def aMalformedDnaDto() {
+        new DnaDto(["AAA", "BBB", "CCC"] as String[])
+    }
+
+    def aNotSquareDnaDto() {
+        new DnaDto(["AA", "TT", "CC"] as String[])
     }
 
 }

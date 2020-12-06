@@ -2,6 +2,7 @@ package ar.com.magneto.service;
 
 import ar.com.magneto.dto.DnaDto;
 import ar.com.magneto.exception.GenomeException;
+import ar.com.magneto.exception.InvalidDnaException;
 import ar.com.magneto.exception.Neo4jAdapterException;
 import ar.com.magneto.exception.RedisException;
 import ar.com.magneto.exception.StatsException;
@@ -26,6 +27,9 @@ public class GenomeService {
 
     private static final String STATS_ERROR = "Ha ocurrido un error al registrar las estadísticas del ADN.";
     private static final String GENOME_EVALUATION_ERROR = "Ha ocurrido un error al evaluar el genoma";
+    private static final String DNA_NOT_SQUARE_ERROR = "El ADN debe ser una matriz de N x N (cuadrada)";
+    private static final String DNA_MALFORMED_ERROR = "El ADN debe estar compuesto por las bases A,T,C o G";
+    private static final String DNA_NOT_EMPTY_ERROR = "El ADN no puede estar vacío";
 
     @Autowired
     private Neo4jAdapter neo4jAdapter;
@@ -37,8 +41,15 @@ public class GenomeService {
     private StatsService statsService;
 
     public Boolean isMutant(DnaDto dnaDto) {
+        this.validateGenome(dnaDto);
         return this.findGenome(dnaDto)
                 .orElseGet(()->this.evaluateGenome(dnaDto));
+    }
+
+    private void validateGenome(DnaDto dnaDto) {
+        if(!dnaDto.hasContent()) throw new InvalidDnaException(DNA_NOT_EMPTY_ERROR);
+        if(!dnaDto.hasRightBases()) throw new InvalidDnaException(DNA_MALFORMED_ERROR);
+        if(!dnaDto.isSquare()) throw new InvalidDnaException(DNA_NOT_SQUARE_ERROR);
     }
 
     private Boolean evaluateGenome(DnaDto dnaDto) {

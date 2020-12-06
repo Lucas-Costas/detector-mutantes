@@ -1,5 +1,6 @@
 package ar.com.magneto.dto
 
+
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -36,6 +37,58 @@ class DnaDtoTest extends Specification {
             ["a"]                 | 1
             ["ab", "cd"]          | 2
             ["abc", "def", "ghi"] | 3
+    }
+
+    @Unroll
+    def "Evalua si un ADN tiene contenido cuando #caso"(){
+        when: "Evaluo si un ADN es cuadrado"
+            Boolean result = dnaDto.hasContent()
+        then: "El ADN #caso"
+            result == hasContent
+        where:
+            caso                 | dnaDto          | hasContent
+            "tiene contenido"    | aValidDnaDto()  | true
+            "no tiene contenido" | anEmptyDnaDto() | false
+    }
+
+    @Unroll
+    def "Evalua si un ADN es cuadrado cuando #caso"(){
+        when: "Evaluo si un ADN es cuadrado"
+            Boolean result = dnaDto.isSquare()
+        then: "El ADN #caso"
+            result == isSquare
+        where:
+            caso             | dnaDto             | isSquare
+            "es cuadrado"    | aValidDnaDto()     | true
+            "no es cuadrado" | aNotSquareDnaDto() | false
+    }
+
+    @Unroll
+    def "Evalua si un ADN esta bien formado cuando #caso"(){
+        when: "Evaluo si un ADN es cuadrado"
+            Boolean result = dnaDto.hasRightBases()
+        then: "El ADN #caso"
+            result == hasRightBases
+        where:
+            caso                | dnaDto             | hasRightBases
+            "esta bien formado" | aValidDnaDto()     | true
+            "esta mal formado"  | aMalformedDnaDto() | false
+    }
+
+    def aValidDnaDto() {
+        new DnaDto(["AAA", "CCC", "TTT"] as String[])
+    }
+
+    def anEmptyDnaDto() {
+        new DnaDto([] as String[])
+    }
+
+    def aMalformedDnaDto() {
+        new DnaDto(["AAA", "BBB", "CCC"] as String[])
+    }
+
+    def aNotSquareDnaDto() {
+        new DnaDto(["AA", "TT", "CC"] as String[])
     }
 
 }
