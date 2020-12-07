@@ -1,11 +1,13 @@
 package ar.com.magneto.redis;
 
 import ar.com.magneto.exception.RedisException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class RedisAdapter {
 

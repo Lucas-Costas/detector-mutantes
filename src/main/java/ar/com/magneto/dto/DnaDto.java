@@ -24,7 +24,7 @@ public class DnaDto {
     }
 
     public Boolean hasContent(){
-        return this.dna.length != 0;
+        return this.dna != null && this.dna.length != 0;
     }
 
     public Boolean isSquare(){

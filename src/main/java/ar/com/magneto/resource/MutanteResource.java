@@ -9,6 +9,7 @@ import ar.com.magneto.exception.StatsException;
 import ar.com.magneto.exception.StatsUpdateException;
 import ar.com.magneto.service.GenomeService;
 import ar.com.magneto.service.StatsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class MutanteResource {
 
@@ -43,16 +45,19 @@ public class MutanteResource {
 
     @ExceptionHandler(InvalidDnaException.class)
     public ResponseEntity<ErrorDto> handleInvalidDnaException(InvalidDnaException ide){
+        log.error(DNA_INVALIDO_ERROR,ide);
         return new ResponseEntity<>(new ErrorDto(DNA_INVALIDO_ERROR,ide.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({GenomeException.class, StatsUpdateException.class})
     public ResponseEntity<ErrorDto> handleDnaEvaluationException(RuntimeException ge){
+        log.error(ge.getMessage(),ge);
         return new ResponseEntity<>(new ErrorDto(ge), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({StatsException.class})
-    public ResponseEntity<ErrorDto> handleDnaEvaluationException(StatsException se){
+    public ResponseEntity<ErrorDto> handleStatsException(StatsException se){
+        log.error(STATS_ERROR,se);
         return new ResponseEntity<>(new ErrorDto(STATS_ERROR,se.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

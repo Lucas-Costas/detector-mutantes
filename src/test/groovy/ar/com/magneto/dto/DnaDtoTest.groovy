@@ -49,6 +49,7 @@ class DnaDtoTest extends Specification {
             caso                 | dnaDto          | hasContent
             "tiene contenido"    | aValidDnaDto()  | true
             "no tiene contenido" | anEmptyDnaDto() | false
+            "no tiene ADN"       | aNullDnaDto()   | false
     }
 
     @Unroll
@@ -81,6 +82,10 @@ class DnaDtoTest extends Specification {
 
     def anEmptyDnaDto() {
         new DnaDto([] as String[])
+    }
+
+    def aNullDnaDto() {
+        new DnaDto()
     }
 
     def aMalformedDnaDto() {

@@ -10,7 +10,6 @@ public class MutantDetectionAplication {
 
     public static void main( String... args ) throws Exception
     {
-        //String[] dna = {"ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"};
         SpringApplication.run(MutantDetectionAplication.class,args);
     }
 
