@@ -98,18 +98,20 @@ public class GenomeService {
     }
 
     private void recordGenome(DnaDto dnaDto, Boolean isMutant) {
+        String idGenome = dnaDto.getIdGenome();
         try {
-            redisAdapter.setBoolean(dnaDto.getIdGenome(), isMutant);
+            redisAdapter.setBoolean(idGenome, isMutant);
         } catch (RedisException ex){
-            log.warn(RECORD_GENOME_WARN,dnaDto.getIdGenome(),ex);
+            log.warn(RECORD_GENOME_WARN,idGenome,ex);
         }
     }
 
     private Optional<Boolean> findGenome(DnaDto dnaDto) {
+        String idGenome = dnaDto.getIdGenome();
         try {
-            return redisAdapter.getBooleanIfExists(dnaDto.getIdGenome());
+            return redisAdapter.getBooleanIfExists(idGenome);
         } catch (RedisException ex){
-            log.warn(FIND_GENOME_WARN,dnaDto.getIdGenome(),ex);
+            log.warn(FIND_GENOME_WARN, idGenome,ex);
             return Optional.empty();
         }
     }

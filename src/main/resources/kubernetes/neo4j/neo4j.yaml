@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-neo4j
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mutant-neo4j
+spec:
+  selector:
+    matchLabels:
+      app: mutant-neo4j
+  serviceName: "mutant-neo4j"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mutant-neo4j # Pod template's label selector
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mutant-neo4j
+          image: neo4j:latest
+          ports:
+            - containerPort: 7474
+              name: browser
+            - containerPort: 7687
+              name: bolt
+            - containerPort: 6000
+              name: tx
+          volumeMounts:
+            - name: pvc-neo4j
+              mountPath: /data
+      volumes:
+        - name: pvc-neo4j
+          persistentVolumeClaim:
+            claimName: pvc-neo4j

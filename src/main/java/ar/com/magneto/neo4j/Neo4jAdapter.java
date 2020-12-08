@@ -3,6 +3,7 @@ package ar.com.magneto.neo4j;
 import ar.com.magneto.exception.Neo4jAdapterException;
 import ar.com.magneto.neo4j.query.CypherQuery;
 import ar.com.magneto.neo4j.query.NoReturnCypherQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Component
 public class Neo4jAdapter implements AutoCloseable {
 
@@ -54,7 +56,7 @@ public class Neo4jAdapter implements AutoCloseable {
 
     private <T> T execWriteTransaction(TransactionWork<T> cypherOperation){
         try ( Session session = driver.session() ){
-            return session.writeTransaction( cypherOperation );
+            return session.writeTransaction(cypherOperation);
         } catch (Exception ex) {
             throw new Neo4jAdapterException(EXEC_TRANSACTION_ERROR, ex);
         }

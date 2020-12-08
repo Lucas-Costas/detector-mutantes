@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mutant-detector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mutant-detector
+  template:
+    metadata:
+      labels:
+        app: mutant-detector
+    spec:
+      containers:
+        - name: mutant-detector
+          image: gcr.io/brave-server-298015/mutante-detector:latest
+          ports:
+            - containerPort: 8080

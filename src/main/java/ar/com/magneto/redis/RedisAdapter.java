@@ -18,7 +18,7 @@ public class RedisAdapter {
     private static final String COUNTER_INCR_ERROR = "Ocurrió un error al incrementar el contador con clave ";
     private static final String GET_COUNTER_ERROR = "Ocurrió un error al obtener el valor del contador con clave ";
 
-    Jedis jedis = new Jedis();
+    Jedis jedis = new Jedis("10.0.0.11");
 
     public void setBoolean(String key, Boolean booleanValue) {
         try {
