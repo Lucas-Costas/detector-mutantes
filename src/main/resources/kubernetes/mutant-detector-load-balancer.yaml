@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mutant-detector
+spec:
+  type: LoadBalancer
+  selector:
+    app: mutant-detector
+  ports:
+  - port: 80
+    targetPort: 8080
