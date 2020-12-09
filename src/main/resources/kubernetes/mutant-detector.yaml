@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: mutant-detector
-          image: gcr.io/brave-server-298015/mutante-detector:latest
+          image: gcr.io/mutantes-298112/mutantes:latest
           ports:
             - containerPort: 8080

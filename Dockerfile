@@ -1,5 +1,4 @@
 FROM openjdk:11
-#ARG JAR_FILE
 
 COPY mutantes-1.6.jar /app.jar
 
