@@ -27,7 +27,7 @@ curl --location --request POST 'http://35.199.122.12/mutant' \
 curl --location --request GET 'http://35.199.122.12/stats'
 ```
 
-### Pre-requisitos 📋
+## Pre-requisitos 📋
 
 _Dependencias:_
 
@@ -75,7 +75,7 @@ _Conectar contenedor a la red (Aplicar con el container de redis, neo4j y el de 
 docker network connect mutant-detector-net <containerNameOrId>
 ```
 
-### Instalación 🔧
+## Instalación 🔧
 
 _1) Antes de iniciar debemos tomar nota de las IP de las bases REDIS y Neo4j para hacerlo determinamos la IP de sus containers usando_
 ```
@@ -84,6 +84,7 @@ docker inspect <containerNameOrId>
 _2) Modificar_ 
   * La property "neo4j.url" indicando la IP del container para neo4j
   * El valor del constructor de Jedis en RedisAdapter con la IP del container de redis
+  
 _3) Ir al directorio de la aplicación_
 ```
 cd $APP_DIR
@@ -92,7 +93,8 @@ _4) Compilar el proyecto_
 ```
 ./gradlew build
 ```
-_5) Copiar el JAR (build/libs/mutantes-1.6.jar a la carpeta del proyecto)
+_5) Copiar el JAR (build/libs/mutantes-1.6.jar a la carpeta del proyecto)_
+
 _6) Generar la imagen de docker_
 ```
 docker build -t magneto/mutant-detector:1.0 .
@@ -101,7 +103,7 @@ _7) Correr la imagen_
 ```
 docker run -p 8080:8080 --name mutant-detector magneto/mutant-detector:1.0
 ```
-_7) Conectar el contenedor a la red_
+_8) Conectar el contenedor a la red_
 ```
 docker network connect mutant-detector-net <containerNameOrId>
 ```
