@@ -36,6 +36,7 @@ _Dependencias:_
 * Docker
 * Groovy
 * Java
+* Lombok (Con procesador de anotaciones activado)
 ```
 
 _Antes de poner en marcha el API necesitamos_
